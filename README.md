@@ -1,156 +1,147 @@
+# 📩 Automated Email Campaign & Lead Scoring System
 
-# 📂 Jira to GitHub Task Automation & Test Case Generator
+## Overview
 
-This project automates the end-to-end process of reading tasks from a `.docx` document, creating Jira tickets for each task, creating GitHub branches, pushing task files, and generating markdown test cases. It is ideal for QA teams, developers, or managers to streamline task tracking and documentation using Python.
+This project is a **full pipeline** that:
 
----
-
-## 🚀 Key Features
-
-- 📄 **Task Extraction**: Extracts structured task titles and descriptions from a Word `.docx` file.
-- 🐞 **Jira Ticket Creation**: Automatically creates tasks in Jira using REST API.
-- 🌿 **GitHub Branch Automation**: Creates a GitHub repo and branches for each task, and commits `.md` files.
-- 🧪 **Test Case Generation**: Generates test cases in Markdown format from the same task input.
-
----
-
-## 🗂 Project Structure
-
-| File Name     | Purpose                                                                 |
-|---------------|-------------------------------------------------------------------------|
-| `ji.py`       | Extracts tasks from `.docx` and creates Jira tasks using REST API       |
-| `giit.py`     | Creates GitHub repo, branches, and pushes task files (`.md`)            |
-| `test.py`     | Generates structured test cases in Markdown format for each task        |
-
+- Scrapes company data from LinkedIn.
+- Merges it with email information.
+- Sends personalized marketing emails.
+- Tracks user engagement (email opens, clicks).
+- Predicts Hot/Cold leads using Machine Learning.
+- Generates a final campaign performance report.
 
 ---
 
-## 🧾 Use Case
+## ✨ Features
 
-Suppose you have a document titled `Sales Process Automation (1).docx` with multiple tasks written as:
+- **Company Scraping**: Fetches company details (industry, website, phone, etc.) from LinkedIn using Selenium.
+- **Email Sending**: Sends personalized HTML emails using Gmail SMTP and tracks opens and clicks.
+- **Engagement Tracking**: Flask server APIs log email sent, opens (pixel tracking), and link clicks.
+- **Lead Scoring Model**: Trains a Logistic Regression model to predict Hot and Cold leads based on engagement.
+- **Campaign Analytics**: Summarizes Open Rate, Click-Through Rate, Hot Leads, and Cold Leads.
 
-```
-Task 1: Set up login page
-This task includes designing the login page and backend validation.
+---
 
-Task 2: Integrate API
-Connect the frontend to the user authentication API and validate session.
-```
+## 💂️ Project Structure
 
-This system will:
-
-1. Create Jira tickets like `SAL-101`, `SAL-102` for each task.
-2. Create a GitHub repo (e.g., `auto-created-repo`), with branches like `set-up-login-page`, `integrate-api`.
-3. Push each task as a `.md` file in its branch.
-4. Generate test case files like `tc-set-up-login-page.md`.
+| File                     | Description                                                                                        |
+| ------------------------ | -------------------------------------------------------------------------------------------------- |
+| `scrape_linkedin.py`     | Scrapes LinkedIn company profiles and saves to  `linkedin_company_about_details.csv`              |
+| `emails.py`              | Merges company data with emails into `updated_data_file.xlsx`.                                     |
+| `emaills.py`             | Sends personalized HTML emails and tracks records.                                                 |
+| `email_template.html`    | Responsive, dynamic email template with open & click tracking.                                     |
+| `server2.py`             | Flask server to track email opens and link clicks, and record data into `email_tracking_data.csv`. |
+| `api.py`                 | Alternative script to hit the `/send_email` endpoint for logging sent emails.                      |
+| `automation_hitemail.py` | Automates hitting open and click tracking URLs using Selenium.                                     |
+| `ML_Model.py`            | Trains a Machine Learning model to classify leads as Hot or Cold based on tracking behavior.       |
+| `Report.py`              | Generates final analytics and saves campaign summary report.                                       |
 
 ---
 
 ## ⚙️ Setup Instructions
 
-### 1. Install Dependencies
+### 1. Install Requirements
 
 ```bash
-pip install python-docx requests
+pip install pandas scikit-learn flask selenium webdriver-manager openpyxl
 ```
 
----
+### 2. Scrape Company Data
 
-## 🔑 Configuration
-
-Update the following values inside the scripts before running:
-
-### 🔹 In `ji.py` (Jira Credentials):
-
-```python
-JIRA_URL = "https://your-domain.atlassian.net"
-EMAIL = "your-email@example.com"
-API_TOKEN = "your-jira-api-token"
-PROJECT_KEY = "SAL"  # Replace with your project key
-```
-
-### 🔹 In `giit.py` (GitHub Credentials):
-
-```python
-GITHUB_USERNAME = "your-github-username"
-GITHUB_TOKEN = "your-github-token"
-REPO_NAME = "auto-created-repo"
-```
-
----
-
-## 🧪 Execution Steps
-
-### 🔹 Step 1: Create Jira Tickets
+- Open `scrape_linkedin.py`.
+- Ensure you have updated your LinkedIn credentials.
+- Run the script:
 
 ```bash
-python ji.py
+python scrape_linkedin.py
 ```
 
-- Parses `.docx` file and creates tickets in Jira for each task.
+### 3. Merge Emails
 
----
-
-### 🔹 Step 2: Create GitHub Repo, Branches, and Commit Files
+- Place your `emails.csv` file alongside the scripts.
+- Run:
 
 ```bash
-python giit.py
+python emails.py
 ```
 
-- Creates a public repo, creates branches based on task titles, and pushes `.md` files for each task.
+- It will generate `updated_data_file.xlsx`.
 
----
+### 4. Start Tracking Server
 
-### 🔹 Step 3: Generate Test Case Files
+- Run:
 
 ```bash
-python test.py
+python server2.py
 ```
 
-- Creates structured test case markdown files with steps, expected results, and placeholder for Jira ticket links.
+- This will start the Flask server on port 5000 for email tracking.
 
----
+### 5. Send Emails
 
-## 📄 Sample Output Files
+- Configure sender details in `emaills.py`.
+- Run:
 
-- `auto-created-repo/`: GitHub repository with branches per task.
-- `set-up-login-page.md`: Markdown file pushed to GitHub per task.
-- `tc-set-up-login-page.md`: Generated test case file in Markdown.
-- Jira Issues: Created in your Jira project with correct titles and descriptions.
+```bash
+python emaills.py
+```
 
----
+### 6. (Optional) Automate Tracking Verification
 
-## 📘 Example Test Case Output
+- Run:
 
-```markdown
-## Test Case ID: TC-SAL-101
-- **Title**: Set up login page
-- **Preconditions**: Ensure user is logged in
-- **Test Steps**:
-  1. Navigate to the login page
-  2. Verify the UI loads properly
-  3. Validate backend functionality
-- **Expected Result**: Login should succeed with valid credentials.
-- **Link to Jira Ticket**: [Jira Ticket](https://jira.company.com/browse/SAL-101)
+```bash
+python automation_hitemail.py
+```
+
+### 7. Train the ML Model
+
+- Run:
+
+```bash
+python ML_Model.py
+```
+
+### 8. Generate Campaign Report
+
+- Run:
+
+```bash
+python Report.py
 ```
 
 ---
 
-## 🛡️ Security Notes
+## 📊 Output Files
 
-- Do **not** hardcode API tokens in production projects.
-- Use environment variables or `.env` files to securely manage credentials.
+- `linkedin_company_about_details.csv`: Scraped LinkedIn company data.
+- `updated_data_file.xlsx`: Merged company + email data.
+- `email_tracking_data.csv`: Engagement tracking data (opens, clicks).
+- `Lead_Scoring_Report.csv`: Predicted lead status after ML model.
+- `Campaign_Analytics_Summary.csv`: Final performance summary.
+
+---
+
+## 🔥 Highlights
+
+- **Real Email Tracking** using a tracking pixel and link tracking.
+- **Machine Learning Integration** for smarter lead classification.
+- **Automated Scraping** and **Automated Campaign Execution**.
+- **Beautiful HTML Emails** personalized for each receiver.
+
+---
+
+## 🚀 Future Enhancements
+
+- Add real unsubscribe link handling.
+- Integrate with CRM systems like HubSpot or Salesforce.
+- Enhance ML model with more features like email response time, bounce rates, etc.
 
 ---
 
 ## 🧑‍💻 Author
 
-**Prashant Kumar**  
-Email: `prashantsahay121@gmail.com`  
-Project Type: Internal Tool / Automation Script
+**Prashant Sahay**\
+[Business Development Manager @ Tech Innovators Inc.]
 
----
-
-## 📌 License
-
-This project is open for educational and personal use. Feel free to extend it with more integrations like Confluence, Slack alerts, or test execution hooks.
